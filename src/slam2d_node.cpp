@@ -8,6 +8,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/MultiEchoLaserScan.h>
 #include <sensor_msgs/LaserScan.h>
+#include <sensor_msgs/PointCloud2.h>
 #include "tf/transform_broadcaster.h"
 #include <Eigen/Eigen>
 
@@ -41,6 +42,13 @@ void multiecho2laserscan(const sensor_msgs::MultiEchoLaserScanConstPtr &msg)
     pub_laserscan.publish(laserscan);
 }
 
+void pointcloud2_callback(const sensor_msgs::PointCloud2ConstPtr &msg)
+{
+    slam.readin_scan_data(msg);
+    slam.update();
+    publish_pose(slam);
+    publish_map2d(slam);
+}
 void laserscan_callback(const sensor_msgs::LaserScanConstPtr &msg)
 {
     slam.readin_scan_data(msg);
@@ -107,6 +115,7 @@ int main(int argc, char **argv)
 
     ros::Subscriber sub_multiecho_laserscan = nh.subscribe<sensor_msgs::MultiEchoLaserScan>("/multiecho_scan", 100, multiecho_laserscan_callback);
     ros::Subscriber sub_laserscan = nh.subscribe<sensor_msgs::LaserScan>("/scan", 100, laserscan_callback);
+    ros::Subscriber sub_pointcloud2 = nh.subscribe<sensor_msgs::PointCloud2>("/pointcloud2", 100, pointcloud2_callback);
 
     pub_laserscan = nh.advertise<sensor_msgs::LaserScan>("/laserscan", 100);
     pub_pose = nh.advertise<geometry_msgs::PoseStamped>("/est_pose", 100);

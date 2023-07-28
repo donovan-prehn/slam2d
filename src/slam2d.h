@@ -5,6 +5,7 @@
 #include <iostream>
 #include <Eigen/Eigen>
 #include <sensor_msgs/MultiEchoLaserScan.h>
+#include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/LaserScan.h>
 #include <nav_msgs/OccupancyGrid.h>
 #include <pcl/point_cloud.h>
@@ -64,7 +65,7 @@ public:
 
     bool cvmap_vis_enable = false;
 
-
+    void readin_scan_data(const sensor_msgs::PointCloud2ConstPtr &msg);
     void readin_scan_data(const sensor_msgs::MultiEchoLaserScanConstPtr &msg);
     void readin_scan_data(const sensor_msgs::LaserScanConstPtr &msg);
 
@@ -105,7 +106,19 @@ slam2d::slam2d()
 slam2d::~slam2d()
 {
 }
-
+void slam2d::readin_scan_data(const sensor_msgs::PointCloud2ConstPtr &msg)
+{
+    timestamp = msg->header.stamp.toSec();
+    scan.points.resize(msg->data.size());
+    for (auto i = 0; i < msg->data.size(); i++)
+    {
+        scan.points[i].x = data[i].x
+        scan.points[i].y = data[i].y
+    }
+    scan.width = scan.points.size();
+    scan.height = 1;
+    scan.is_dense = true;
+}
 void slam2d::readin_scan_data(const sensor_msgs::MultiEchoLaserScanConstPtr &msg)
 {
     timestamp = msg->header.stamp.toSec();
